@@ -1,3 +1,5 @@
+version: '3'
+
 networks:
   ghost-network:
     external: true
@@ -7,7 +9,6 @@ networks:
 volumes:
   mysql-data:
   ghost-data:
-  traefik-certificates:
 
 services:
   mysql:
@@ -51,16 +52,12 @@ services:
       timeout: 5s
       retries: 5
       start_period: 90s
-
-    
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.ghost.rule=Host(`${GHOST_HOSTNAME}`)"
       - "traefik.http.routers.ghost.service=ghost"
-      - "traefik.http.routers.ghost.entrypoints=websecure"
+      - "traefik.http.routers.ghost.entrypoints=web"
       - "traefik.http.services.ghost.loadbalancer.server.port=2368"
-      - "traefik.http.routers.ghost.tls=true"
-      - "traefik.http.routers.ghost.tls.certresolver=letsencrypt"
       - "traefik.http.services.ghost.loadbalancer.passhostheader=true"
       - "traefik.http.routers.ghost.middlewares=compresstraefik"
       - "traefik.http.middlewares.compresstraefik.compress=true"
@@ -82,27 +79,19 @@ services:
       - "--ping.entrypoint=ping"
       - "--entryPoints.ping.address=:8082"
       - "--entryPoints.web.address=:80"
-      - "--entryPoints.websecure.address=:443"
       - "--providers.docker=true"
       - "--providers.docker.endpoint=unix:///var/run/docker.sock"
       - "--providers.docker.exposedByDefault=false"
-      - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
-      - "--certificatesresolvers.letsencrypt.acme.storage=/etc/traefik/acme/acme.json"
       - "--metrics.prometheus=true"
       - "--metrics.prometheus.buckets=0.1,0.3,1.2,5.0"
       - "--global.checkNewVersion=true"
       - "--global.sendAnonymousUsage=false"
-      - "--certificatesresolvers.letsencrypt.acme.httpchallenge=true"
-      - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
-
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - traefik-certificates:/etc/traefik/acme
     networks:
       - traefik-network
     ports:
       - "80:80"
-      - "443:443"
     healthcheck:
       test: ["CMD", "wget", "http://localhost:8082/ping","--spider"]
       interval: 10s
@@ -111,10 +100,4 @@ services:
       start_period: 5s
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.ghost.rule=Host(`${GHOST_HOSTNAME}`)"
-      - "traefik.http.routers.ghost.entrypoints=websecure"
-      - "traefik.http.routers.ghost.tls=true"
-      - "traefik.http.routers.ghost.tls.certresolver=letsencrypt"
-      - "traefik.http.services.ghost.loadbalancer.server.port=2368"
     restart: unless-stopped
-
