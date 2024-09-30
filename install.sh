@@ -54,7 +54,7 @@ check_docker_compose() {
 }
 
 # Prompt for configuration values
-read -p "Enter your desired domain name (e.g., example.com or test.examle.com ): " domain_name
+read -p "Enter your desired domain name (e.g., example.com or test.examle.com): " domain_name
 echo
 read -p "Enter your desired database user password (min length 10, containing both strings and numbers): " db_user_password
 echo
@@ -80,11 +80,20 @@ echo "Database admin password: $db_admin_password"
 read -p "Do you want to proceed with these values? (y/n) " choice
 
 if [[ "$choice" =~ ^[Yy]$ ]]; then
-    
+    # Navigate to home directory
+    home_dir=$(eval echo "~$USER")
+    cd "$home_dir" || exit
+    # Check and install Docker if necessary
     check_and_install_docker
     # Check and install Docker Compose if necessary
     check_docker_compose
-    
+    # Navigate to home directory
+    home_dir=$(eval echo "~$USER")
+    cd "$home_dir" || exit
+    # Clone the Ghost repository
+    git clone https://github.com/team-youpel/ghost-traefik-letsencrypt-docker-compose.git
+    # Change directory to the cloned repository
+    cd ghost-traefik-letsencrypt-docker-compose || exit
     # Create a new .env file with the provided values
     rm -rf .env
     cat >.env <<EOF
