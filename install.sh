@@ -90,8 +90,7 @@ if [[ "$choice" =~ ^[Yy]$ ]]; then
     # Navigate to home directory
     home_dir=$(eval echo "~$USER")
     cd "$home_dir" || exit
-    # Clone the Ghost repository
-    git clone https://github.com/team-youpel/ghost-traefik-letsencrypt-docker-compose.git
+   
     # Change directory to the cloned repository
     cd ghost-traefik-letsencrypt-docker-compose || exit
     # Create a new .env file with the provided values
@@ -99,7 +98,7 @@ if [[ "$choice" =~ ^[Yy]$ ]]; then
     cat >.env <<EOF
 # Traefik Variables
 TRAEFIK_IMAGE_TAG=traefik:3.1.4
-TRAEFIK_LOG_LEVEL=WARN
+TRAEFIK_LOG_LEVEL=DEBUG
 
 # Ghost Variables
 GHOST_MYSQL_IMAGE_TAG=mysql:8

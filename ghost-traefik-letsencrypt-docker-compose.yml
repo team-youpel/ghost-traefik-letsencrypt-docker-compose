@@ -92,6 +92,9 @@ services:
       - "--metrics.prometheus.buckets=0.1,0.3,1.2,5.0"
       - "--global.checkNewVersion=true"
       - "--global.sendAnonymousUsage=false"
+      - "--certificatesresolvers.letsencrypt.acme.httpchallenge=true"
+      - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
+
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - traefik-certificates:/etc/traefik/acme
