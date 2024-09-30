@@ -59,7 +59,8 @@ services:
       - "traefik.http.middlewares.compresstraefik.compress=true"
       - "traefik.docker.network=traefik-network"
       - "traefik.http.routers.ghost.entrypoints=web"
-
+      - "traefik.http.routers.ghost.entrypoints=websecure"
+      - "traefik.http.routers.ghost.tls=true"
     restart: unless-stopped
     depends_on:
       mysql:
@@ -79,6 +80,8 @@ services:
       - "--providers.docker.endpoint=unix:///var/run/docker.sock"
       - "--providers.docker.exposedByDefault=false"
       - "--traefik.http.routers.ghost.tls.passthrough=true"
+      - "--entryPoints.web.address=:80"
+      - "--entryPoints.websecure.address=:443"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
