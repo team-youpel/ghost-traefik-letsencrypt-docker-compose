@@ -98,7 +98,7 @@ if [[ "$choice" =~ ^[Yy]$ ]]; then
     rm -rf .env
     cat >.env <<EOF
 # Traefik Variables
-TRAEFIK_IMAGE_TAG=traefik:2.9
+TRAEFIK_IMAGE_TAG=traefik:3.1.4
 TRAEFIK_LOG_LEVEL=WARN
 
 # Ghost Variables
