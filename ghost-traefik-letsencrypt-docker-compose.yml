@@ -53,8 +53,13 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.ghost.rule=Host(`${GHOST_HOSTNAME}`)"
+      - "traefik.http.routers.ghost.service=ghost"
+      - "traefik.http.services.ghost.loadbalancer.passhostheader=true"
+      - "traefik.http.routers.ghost.middlewares=compresstraefik"
+      - "traefik.http.middlewares.compresstraefik.compress=true"
+      - "traefik.docker.network=traefik-network"
       - "traefik.http.routers.ghost.entrypoints=web"
-      - "traefik.http.services.ghost.loadbalancer.server.port=2368"
+
     restart: unless-stopped
     depends_on:
       mysql:
@@ -63,11 +68,19 @@ services:
   traefik:
     image: ${TRAEFIK_IMAGE_TAG}
     command:
-      - "--log.level=DEBUG"
+      - "--log.level=${TRAEFIK_LOG_LEVEL}"
+      - "--accesslog=true"
+      - "--api.dashboard=true"
       - "--api.insecure=true"
+      - "--ping=true"
+      - "--ping.entrypoint=ping"
+      - "--entryPoints.ping.address=:8082"
+      - "--entryPoints.web.address=:80"
+      - "--entryPoints.websecure.address=:443"
       - "--providers.docker=true"
-      - "--providers.docker.exposedbydefault=false"
-      - "--entrypoints.web.address=:80"
+      - "--providers.docker.endpoint=unix:///var/run/docker.sock"
+      - "--providers.docker.exposedByDefault=false"
+
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
