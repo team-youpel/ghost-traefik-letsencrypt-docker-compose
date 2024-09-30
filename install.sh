@@ -54,7 +54,7 @@ check_docker_compose() {
 }
 
 # Prompt for configuration values
-read -p "Enter your desired domain name (e.g., example.com or test.examle.com): " domain_name
+read -p "Enter your desired domain name (e.g., example.com or test.examle.com ): " domain_name
 echo
 read -p "Enter your desired database user password (min length 10, containing both strings and numbers): " db_user_password
 echo
@@ -110,7 +110,7 @@ GHOST_DB_PASSWORD=$db_user_password
 GHOST_DB_ADMIN_PASSWORD=$db_admin_password
 GHOST_URL=https://$domain_name
 GHOST_HOSTNAME=$domain_name
-
+DATA_PATH=/var/lib/ghost/content
 
 EOF
 
