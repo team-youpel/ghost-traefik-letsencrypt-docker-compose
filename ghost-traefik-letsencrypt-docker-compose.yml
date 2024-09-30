@@ -17,7 +17,6 @@ services:
     image: ${GHOST_MYSQL_IMAGE_TAG}
     volumes:
       - mysql-data:/var/lib/mysql
-    command: --default-authentication-plugin=mysql_native_password
     environment: 
       MYSQL_DATABASE: ${GHOST_DB_NAME}
       MYSQL_USER: ${GHOST_DB_USER}
