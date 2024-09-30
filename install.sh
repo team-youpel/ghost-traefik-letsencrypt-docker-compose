@@ -133,7 +133,7 @@ EOF
     docker network create ghost-network
 
     # Start the Docker containers
-    docker compose -f ghost-traefik-letsencrypt-docker-compose.yml -p ghost up -d
+    docker compose -f ghost-traefik-letsencrypt-docker-compose.yml -p ghost up
 
     echo -e "${BOLDGREEN}✔ Ghost blog should now be accessible after a few seconds at https://$domain_name${ENDCOLOR}"
 else
