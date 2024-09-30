@@ -16,8 +16,8 @@ GHOST_CONTAINER=$(docker ps -aqf "name=ghost-ghost")
 GHOST_BACKUPS_CONTAINER=$(docker ps -aqf "name=ghost-backups")
 GHOST_DB_NAME="ghostdb"
 GHOST_DB_USER=$(docker exec $GHOST_BACKUPS_CONTAINER printenv GHOST_DB_USER)
-MARIADB_PASSWORD=$(docker exec $GHOST_BACKUPS_CONTAINER printenv GHOST_DB_PASSWORD)
-BACKUP_PATH="/srv/ghost-mariadb/backups/"
+MYSQL_PASSWORD=$(docker exec $GHOST_BACKUPS_CONTAINER printenv GHOST_DB_PASSWORD)
+BACKUP_PATH="/srv/ghost-mysql/backups/"
 
 echo "--> All available database backups:"
 
@@ -27,7 +27,7 @@ do
 done
 
 echo "--> Copy and paste the backup name from the list above to restore database and press [ENTER]"
-echo "--> Example: ghost-mariadb-backup-YYYY-MM-DD_hh-mm.gz"
+echo "--> Example: ghost-mysql-backup-YYYY-MM-DD_hh-mm.gz"
 echo -n "--> "
 
 read SELECTED_DATABASE_BACKUP
@@ -38,8 +38,8 @@ echo "--> Stopping service..."
 docker stop "$GHOST_CONTAINER"
 
 echo "--> Restoring database..."
-docker exec "$GHOST_BACKUPS_CONTAINER" sh -c "mariadb -h mariadb -u $GHOST_DB_USER --password=$MARIADB_PASSWORD -e 'DROP DATABASE $GHOST_DB_NAME; CREATE DATABASE $GHOST_DB_NAME;' \
-&& gunzip -c ${BACKUP_PATH}${SELECTED_DATABASE_BACKUP} | mariadb -h mariadb -u $GHOST_DB_USER --password=$MARIADB_PASSWORD $GHOST_DB_NAME"
+docker exec "$GHOST_BACKUPS_CONTAINER" sh -c "mysql -h mysql -u $GHOST_DB_USER --password=$MYSQL_PASSWORD -e 'DROP DATABASE $GHOST_DB_NAME; CREATE DATABASE $GHOST_DB_NAME;' \
+&& gunzip -c ${BACKUP_PATH}${SELECTED_DATABASE_BACKUP} | mysql -h mysql -u $GHOST_DB_USER --password=$MYSQL_PASSWORD $GHOST_DB_NAME"
 echo "--> Database recovery completed..."
 
 echo "--> Starting service..."

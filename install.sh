@@ -93,8 +93,7 @@ if [[ "$choice" =~ ^[Yy]$ ]]; then
     # Navigate to home directory
     home_dir=$(eval echo "~$USER")
     cd "$home_dir" || exit
-    # Clone the Ghost repository
-    git clone https://github.com/team-youpel/ghost-traefik-letsencrypt-docker-compose.git
+   
     # Change directory to the cloned repository
     cd ghost-traefik-letsencrypt-docker-compose || exit
     # Create a new .env file with the provided values
@@ -108,8 +107,8 @@ TRAEFIK_HOSTNAME=traefik.postgoo.net
 TRAEFIK_BASIC_AUTH=traefikadmin:\$\$2y\$\$10\$\$sMzJfirKC75x/hVpiINeZOiSm.Jkity9cn4KwNkRvO7hSQVFc5FLO
 
 # Ghost Variables
-GHOST_MARIADB_IMAGE_TAG=mariadb:11.1
-GHOST_IMAGE_TAG=ghost:5.60
+GHOST_MYSQL_IMAGE_TAG=mysql:8.0
+GHOST_IMAGE_TAG=ghost:latest
 GHOST_DB_NAME=ghostdb
 GHOST_DB_USER=ghostdbbuser
 GHOST_DB_PASSWORD=$db_user_password
@@ -120,12 +119,12 @@ GHOST_HOSTNAME=$domain_name
 # Backup Variables
 BACKUP_INIT_SLEEP=30m
 BACKUP_INTERVAL=24h
-MARIADB_BACKUP_PRUNE_DAYS=7
+MYSQL_BACKUP_PRUNE_DAYS=7
 DATA_BACKUP_PRUNE_DAYS=7
-MARIADB_BACKUPS_PATH=/srv/ghost-mariadb/backups
+MYSQL_BACKUPS_PATH=/srv/ghost-mysql/backups
 DATA_BACKUPS_PATH=/srv/ghost-application-data/backups
 DATA_PATH=/var/lib/ghost/content
-MARIADB_BACKUP_NAME=ghost-mariadb-backup
+MYSQL_BACKUP_NAME=ghost-mysql-backup
 DATA_BACKUP_NAME=ghost-application-data-backup
 EOF
 
