@@ -107,7 +107,7 @@ TRAEFIK_HOSTNAME=traefik.postgoo.net
 TRAEFIK_BASIC_AUTH=traefikadmin:\$\$2y\$\$10\$\$sMzJfirKC75x/hVpiINeZOiSm.Jkity9cn4KwNkRvO7hSQVFc5FLO
 
 # Ghost Variables
-GHOST_MYSQL_IMAGE_TAG=mysql::8.0.29
+GHOST_MYSQL_IMAGE_TAG=mysql:8.0.29
 GHOST_IMAGE_TAG=ghost:latest
 GHOST_DB_NAME=ghostdb
 GHOST_DB_USER=ghostdbbuser
