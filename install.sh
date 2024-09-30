@@ -54,7 +54,9 @@ check_docker_compose() {
 }
 
 # Prompt for configuration values
-read -p "Enter your desired domain name (e.g., example.com or test.examle.com ): " domain_name
+read -p "Enter your desired domain name (e.g., example.com): " domain_name
+echo
+read -p "Enter your email address for Let's Encrypt: " email_address
 echo
 read -p "Enter your desired database user password (min length 10, containing both strings and numbers): " db_user_password
 echo
@@ -74,6 +76,7 @@ done
 # Confirm user input
 echo "You entered the following values:"
 echo "Domain name: $domain_name"
+echo "Email address: $email_address"
 echo "Database user password: $db_user_password"
 echo "Database admin password: $db_admin_password"
 
@@ -90,27 +93,40 @@ if [[ "$choice" =~ ^[Yy]$ ]]; then
     # Navigate to home directory
     home_dir=$(eval echo "~$USER")
     cd "$home_dir" || exit
-   
+    # Clone the Ghost repository
+    git clone https://github.com/team-youpel/ghost-traefik-letsencrypt-docker-compose.git
     # Change directory to the cloned repository
     cd ghost-traefik-letsencrypt-docker-compose || exit
     # Create a new .env file with the provided values
     rm -rf .env
     cat >.env <<EOF
 # Traefik Variables
-TRAEFIK_IMAGE_TAG=traefik:3.1.4
-TRAEFIK_LOG_LEVEL=DEBUG
+TRAEFIK_IMAGE_TAG=traefik:2.9
+TRAEFIK_LOG_LEVEL=WARN
+TRAEFIK_ACME_EMAIL=$email_address
+TRAEFIK_HOSTNAME=traefik.postgoo.net
+TRAEFIK_BASIC_AUTH=traefikadmin:\$\$2y\$\$10\$\$sMzJfirKC75x/hVpiINeZOiSm.Jkity9cn4KwNkRvO7hSQVFc5FLO
 
 # Ghost Variables
-GHOST_MYSQL_IMAGE_TAG=mysql:8
-GHOST_IMAGE_TAG=ghost:latest
+GHOST_MARIADB_IMAGE_TAG=mariadb:11.1
+GHOST_IMAGE_TAG=ghost:5.60
 GHOST_DB_NAME=ghostdb
 GHOST_DB_USER=ghostdbbuser
 GHOST_DB_PASSWORD=$db_user_password
 GHOST_DB_ADMIN_PASSWORD=$db_admin_password
 GHOST_URL=https://$domain_name
 GHOST_HOSTNAME=$domain_name
-DATA_PATH=/var/lib/ghost/content
 
+# Backup Variables
+BACKUP_INIT_SLEEP=30m
+BACKUP_INTERVAL=24h
+MARIADB_BACKUP_PRUNE_DAYS=7
+DATA_BACKUP_PRUNE_DAYS=7
+MARIADB_BACKUPS_PATH=/srv/ghost-mariadb/backups
+DATA_BACKUPS_PATH=/srv/ghost-application-data/backups
+DATA_PATH=/var/lib/ghost/content
+MARIADB_BACKUP_NAME=ghost-mariadb-backup
+DATA_BACKUP_NAME=ghost-application-data-backup
 EOF
 
     # Create necessary Docker networks
@@ -120,7 +136,7 @@ EOF
     # Start the Docker containers
     docker compose -f ghost-traefik-letsencrypt-docker-compose.yml -p ghost up -d
 
-    echo -e "${BOLDGREEN}✔ Ghost blog should now be accessible after a few minutes at https://$domain_name${ENDCOLOR}"
+    echo -e "${BOLDGREEN}✔ Ghost blog should now be accessible after a few seconds at https://$domain_name${ENDCOLOR}"
 else
     echo -e "${ITALICRED}Installation aborted.${ENDCOLOR}"
 fi
